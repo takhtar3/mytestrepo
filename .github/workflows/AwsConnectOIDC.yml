@@ -1,0 +1,31 @@
+# Sample workflow to access AWS resources
+name: AWS example workflow
+on:
+  push
+env:
+  BUCKET_NAME : "action-bucket"
+  AWS_REGION : "eu-north-1"
+# permission can be added at job level or workflow level
+permissions:
+  id-token: write   # This is required for requesting the JWT
+  contents: read    # This is required for actions/checkout
+jobs:
+  DemoOIDC:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v2
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::176107979661:role/github-actions-role
+          role-session-name: samplerolesession
+          aws-region: ${{ env.AWS_REGION }}
+      
+      # print Stuff
+      - name: Print AWS SSM Parameter
+        run: aws ssm get-parameter --name=hello-ta-oidc
+
+      - name: Print assume role
+        run: aws sts get-caller-identity
+          
